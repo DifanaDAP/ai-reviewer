@@ -1,0 +1,60 @@
+name: 'AI PR Reviewer'
+description: 'AI-powered code review for Pull Requests using OpenAI GPT'
+author: 'Your Name'
+
+branding:
+  icon: 'code'
+  color: 'purple'
+
+inputs:
+  openai_model:
+    description: 'OpenAI model to use'
+    required: false
+    default: 'gpt-4o-mini'
+  max_tokens:
+    description: 'Maximum tokens for AI response'
+    required: false
+    default: '4096'
+  review_comment_lgtm:
+    description: 'Leave a comment even when code looks good'
+    required: false
+    default: 'false'
+  debug:
+    description: 'Enable debug logging'
+    required: false
+    default: 'false'
+  config_path:
+    description: 'Path to custom config file (optional)'
+    required: false
+    default: '.ai-reviewer.yml'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install -q openai>=1.0.0 requests>=2.31.0 pydantic>=2.0.0 pyyaml>=6.0
+
+    - name: Run AI Reviewer
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_BODY: ${{ github.event.pull_request.body }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        OPENAI_MODEL: ${{ inputs.openai_model }}
+        MAX_TOKENS: ${{ inputs.max_tokens }}
+        DEBUG: ${{ inputs.debug }}
+        CONFIG_PATH: ${{ inputs.config_path }}
+      run: |
+        python ${{ github.action_path }}/ai_reviewer/main.py
