@@ -23,10 +23,27 @@ inputs:
     description: 'Enable debug logging'
     required: false
     default: 'false'
-  config_path:
-    description: 'Path to custom config file (optional)'
+  enable_storage:
+    description: 'Enable MongoDB/Redis storage (v2 feature)'
     required: false
-    default: '.ai-reviewer.yml'
+    default: 'false'
+  mongodb_uri:
+    description: 'MongoDB connection URI'
+    required: false
+  mongodb_database:
+    description: 'MongoDB database name'
+    required: false
+    default: 'ai_reviewer'
+  redis_host:
+    description: 'Redis host'
+    required: false
+  redis_port:
+    description: 'Redis port'
+    required: false
+    default: '6379'
+  redis_password:
+    description: 'Redis password'
+    required: false
 
 runs:
   using: 'composite'
@@ -39,7 +56,7 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        pip install -q openai>=1.0.0 requests>=2.31.0 pydantic>=2.0.0 pyyaml>=6.0
+        pip install -q -r ${{ github.action_path }}/requirements-review.txt
 
     - name: Run AI Reviewer
       shell: bash
@@ -56,5 +73,12 @@ runs:
         MAX_TOKENS: ${{ inputs.max_tokens }}
         DEBUG: ${{ inputs.debug }}
         CONFIG_PATH: ${{ inputs.config_path }}
+        # Storage Configuration
+        ENABLE_STORAGE: ${{ inputs.enable_storage }}
+        MONGODB_URI: ${{ inputs.mongodb_uri }}
+        MONGODB_DATABASE: ${{ inputs.mongodb_database }}
+        REDIS_HOST: ${{ inputs.redis_host }}
+        REDIS_PORT: ${{ inputs.redis_port }}
+        REDIS_PASSWORD: ${{ inputs.redis_password }}
       run: |
         python ${{ github.action_path }}/ai_reviewer/main.py
