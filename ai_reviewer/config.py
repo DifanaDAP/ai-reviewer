@@ -122,6 +122,18 @@ class Config:
         self.openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         self.max_tokens: int = int(os.getenv("MAX_TOKENS", "4096"))
         
+        # Review Behavior
+        self.review_comment_lgtm: bool = os.getenv("REVIEW_COMMENT_LGTM", "false").lower() == "true"
+        self.review_simple_changes: bool = os.getenv("REVIEW_SIMPLE_CHANGES", "false").lower() == "true"
+        
+        # Storage settings (v2)
+        self.enable_storage: bool = os.getenv("ENABLE_STORAGE", "false").lower() == "true"
+        self.mongodb_uri: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+        self.mongodb_database: str = os.getenv("MONGODB_DATABASE", "ai_reviewer")
+        self.redis_host: str = os.getenv("REDIS_HOST", "localhost")
+        self.redis_port: int = int(os.getenv("REDIS_PORT", "6379") or "6379")
+        self.redis_password: str = os.getenv("REDIS_PASSWORD", "") or None
+        
         # Load review configuration
         self.review: ReviewConfig = self._load_review_config()
     
