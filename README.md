@@ -1,6 +1,8 @@
-# AI PR Reviewer 🤖
+# AI PR Reviewer v2 🤖
 
 An intelligent, automated code review system powered by AI. Like CodeRabbit, but self-hosted and fully customizable!
+
+**v2 New:** MongoDB storage + Redis queue for review history and future vectorization.
 
 ## Quick Start (For Target Repositories)
 
@@ -43,6 +45,8 @@ Then add `OPENAI_API_KEY` to your repository secrets. Done! 🎉
 | **Test Coverage** | Test file changes, coverage ratio, missing tests |
 | **Documentation** | README, CHANGELOG, docstring requirements |
 | **AI Review** | LLM-powered deep code analysis using GPT |
+| **MongoDB Storage** | 🆕 Save reviews as documents for history/analytics |
+| **Redis Queue** | 🆕 Async messaging for future vectorization pipeline |
 
 ### Priority Levels
 
@@ -60,6 +64,31 @@ Then add `OPENAI_API_KEY` to your repository secrets. Done! 🎉
 | `openai_model` | No | `gpt-4o-mini` | OpenAI model to use |
 | `max_tokens` | No | `4096` | Max tokens for response |
 | `debug` | No | `false` | Enable debug logging |
+
+---
+
+## Storage Configuration (v2)
+
+Enable MongoDB/Redis storage by setting these environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENABLE_STORAGE` | `false` | Enable MongoDB + Redis storage |
+| `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection string |
+| `MONGODB_DATABASE` | `ai_reviewer` | Database name |
+| `REDIS_HOST` | `localhost` | Redis host |
+| `REDIS_PORT` | `6379` | Redis port |
+| `REDIS_PASSWORD` | (empty) | Redis password (optional) |
+
+### Docker Setup
+
+Start MongoDB, Mongo Express, and Redis locally:
+
+```bash
+docker-compose up -d
+```
+
+Access Mongo Express UI: http://localhost:8081 (login: `admin` / `admin123`)
 
 ---
 
@@ -86,40 +115,18 @@ ignore:
 
 ---
 
-## Example Output
-
-```markdown
-## 🤖 AI Code Review
-
-### 📊 Summary
-| Metric | Value |
-|--------|-------|
-| Files Changed | 5 |
-| Lines Added | +120 |
-| Status | 🟡 Needs Attention |
-
-### 🔴 HIGH Priority (Blocking)
-| File | Line | Issue |
-|------|------|-------|
-| `auth.py` | 45 | SQL injection vulnerability |
-
-### ✅ What's Good
-- Good test coverage
-- Clear commit messages
-```
-
----
-
 ## Architecture
 
 ```
 ai-reviewer/           ← This repository (GitHub Action)
 ├── action.yml         # Action definition
+├── docker-compose.yml # MongoDB + Redis + Mongo Express
 ├── ai_reviewer/       # Python source code
 │   ├── main.py        # Entry point
 │   ├── analyzers/     # 6 code analyzers
 │   ├── llm/           # OpenAI integration
-│   └── github/        # GitHub API client
+│   ├── github/        # GitHub API client
+│   └── storage/       # 🆕 MongoDB + Redis clients
 └── .ai-reviewer.yml   # Default config
 
 your-repo/             ← Target repository (only 1 file needed!)
@@ -129,26 +136,30 @@ your-repo/             ← Target repository (only 1 file needed!)
 
 ---
 
-## Self-Hosting
-
-1. **Fork/Clone** this repository
-2. **Push** to your GitHub account
-3. **Use** in your projects with `uses: your-username/ai-reviewer@main`
-
----
-
 ## Local Development
 
 ```bash
+# Start storage services
+docker-compose up -d
+
 # Set environment variables
 export GITHUB_TOKEN=ghp_xxxxx
 export OPENAI_API_KEY=sk-xxxxx
 export PR_NUMBER=1
 export REPO=owner/repo
+export ENABLE_STORAGE=true  # Enable v2 storage
 
 # Run
 python ai_reviewer/main.py
 ```
+
+---
+
+## Self-Hosting
+
+1. **Fork/Clone** this repository
+2. **Push** to your GitHub account
+3. **Use** in your projects with `uses: your-username/ai-reviewer@main`
 
 ---
 

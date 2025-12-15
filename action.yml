@@ -27,9 +27,28 @@ inputs:
     description: 'Enable debug logging'
     required: false
     default: 'false'
-  config_path:
-    description: 'Path to custom config file (optional)'
+  enable_storage:
+    description: 'Enable MongoDB/Redis storage (v2 feature)'
     required: false
+    default: 'false'
+  mongodb_uri:
+    description: 'MongoDB connection URI'
+    required: false
+  mongodb_database:
+    description: 'MongoDB database name'
+    required: false
+    default: 'ai_reviewer'
+  redis_host:
+    description: 'Redis host'
+    required: false
+  redis_port:
+    description: 'Redis port'
+    required: false
+    default: '6379'
+  redis_password:
+    description: 'Redis password'
+    required: false
+<<<<<<< HEAD
     default: '.ai-reviewer.yml'
   enable_storage:
     description: 'Enable MongoDB/Redis storage (v2 feature)'
@@ -52,6 +71,8 @@ inputs:
   redis_password:
     description: 'Redis password'
     required: false
+=======
+>>>>>>> ee52ae3a3e51986e8037cbbc9acbb4a77ad55d82
 
 runs:
   using: 'composite'

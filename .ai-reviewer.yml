@@ -70,13 +70,12 @@ testing:
     - "__tests__/**/*"
 
 # Security Patterns (additional custom patterns)
-security:
-  patterns:
-    # Add your custom security patterns here
-    # - name: "Custom Pattern"
-    #   regex: "your_regex_here"
-    #   severity: "HIGH"
-    #   description: "Description of the issue"
+# security:
+#   patterns:
+#     - name: "Example Pattern"
+#       regex: "example"
+#       severity: "LOW"
+#       description: "Example description"
 
 # Naming Conventions
 naming:

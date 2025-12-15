@@ -45,14 +45,17 @@ class PRMetrics(BaseModel):
 
 class ReviewResult(BaseModel):
     """Complete review result."""
+    id: Optional[str] = None  # MongoDB ObjectId as string
     pr_number: int
     pr_title: str
     repo: str
+    version: str = "2.0"  # Schema version for future compatibility
     timestamp: datetime = Field(default_factory=datetime.now)
     metrics: PRMetrics = Field(default_factory=PRMetrics)
     feedbacks: list[Feedback] = Field(default_factory=list)
     summary: str = ""
     positives: list[str] = Field(default_factory=list)
+    diff: str = ""  # Raw diff content for future vectorization
     
     @property
     def high_priority_count(self) -> int:
@@ -183,6 +186,45 @@ class ReviewResult(BaseModel):
         
         # Footer
         lines.append("---")
-        lines.append("*Powered by AI Reviewer* 🤖")
+        lines.append("*Powered by AI Reviewer v2* 🤖")
         
         return "\n".join(lines)
+    
+    def to_mongo_dict(self) -> dict:
+        """
+        Convert to MongoDB-compatible dictionary.
+        
+        Returns:
+            dict: Document ready for MongoDB insertion
+        """
+        data = self.model_dump()
+        # Remove id field (MongoDB will generate _id)
+        data.pop("id", None)
+        # Add computed fields
+        data["overall_status"] = self.overall_status
+        data["size_category"] = self.metrics.size_category
+        return data
+    
+    @classmethod
+    def from_mongo_dict(cls, data: dict) -> "ReviewResult":
+        """
+        Create ReviewResult from MongoDB document.
+        
+        Args:
+            data: MongoDB document
+            
+        Returns:
+            ReviewResult instance
+        """
+        # Convert _id to id string
+        if "_id" in data:
+            data["id"] = str(data.pop("_id"))
+        # Remove computed fields
+        data.pop("overall_status", None)
+        data.pop("size_category", None)
+        data.pop("_created_at", None)
+        data.pop("_version", None)
+        data.pop("vectorized", None)
+        data.pop("vectorized_at", None)
+        return cls(**data)
+

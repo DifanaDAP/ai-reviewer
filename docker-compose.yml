@@ -6,7 +6,11 @@ services:
     image: mongo:7
     container_name: ai-reviewer-mongodb
     ports:
+<<<<<<< HEAD
       - "27018:27017"
+=======
+      - "27017:27017"
+>>>>>>> ee52ae3a3e51986e8037cbbc9acbb4a77ad55d82
     volumes:
       - mongodb_data:/data/db
     environment:
@@ -18,7 +22,11 @@ services:
     image: mongo-express:latest
     container_name: ai-reviewer-mongo-express
     ports:
+<<<<<<< HEAD
       - "8082:8081"
+=======
+      - "8081:8081"
+>>>>>>> ee52ae3a3e51986e8037cbbc9acbb4a77ad55d82
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_BASICAUTH_USERNAME: admin
