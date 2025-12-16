@@ -153,25 +153,13 @@ def run_review() -> int:
             print("💾 Saving review to database...")
             try:
                 from ai_reviewer.storage.mongodb import MongoDBClient
-                from ai_reviewer.storage.redis_queue import RedisQueue
                 
                 # Save to MongoDB
                 mongo = MongoDBClient(config.mongodb_uri, config.mongodb_database)
                 doc_id = mongo.save_review(result.to_mongo_dict())
                 mongo.close()
                 
-                # Publish to Redis queue for future vectorization
-                redis_queue = RedisQueue(
-                    host=config.redis_host,
-                    port=config.redis_port,
-                    password=config.redis_password
-                )
-                redis_queue.publish_review(result.to_mongo_dict(), doc_id)
-                redis_queue.add_to_vectorization_queue(doc_id)
-                redis_queue.close()
-                
                 print(f"   ✅ Saved to MongoDB with ID: {doc_id}")
-                print(f"   ✅ Queued for vectorization")
             except Exception as e:
                 print(f"   ⚠️ Storage failed (non-blocking): {e}")
         

@@ -113,6 +113,70 @@ ignore:
   - "dist/*"
 ```
 
+## Configuration
+
+1. **Environment Config**
+   Create a `.ai-reviewer.yml` file in your project root or `~/.ai-reviewer.yml`:
+
+   ```yaml
+   github_token: "your-github-token"
+   openai_api_key: "your-openai-key"
+   
+   # Storage Settings
+   enable_storage: true
+   mongodb_uri: "mongodb://localhost:27017"
+   mongodb_database: "ai_reviewer"
+   ```
+
+2. **MongoDB Connection**
+   This tool is designed to connect to your existing MongoDB instance.
+   
+   - Ensure your MongoDB server is running.
+   - Update `mongodb_uri` in your configuration to point to your MongoDB server (e.g., `mongodb://user:pass@host:port`).
+
+## Usage
+
+### As a GitHub Action
+
+```yaml
+name: AI Reviewer
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run AI Reviewer
+        uses: your-username/ai-reviewer@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ENABLE_STORAGE: "true"
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+```
+
+### Local Development
+
+1.  **Install Dependencies**
+    ```bash
+    pip install -r requirements-review.txt
+    ```
+
+2.  **Run the Reviewer**
+    ```bash
+    # Set environment variables
+    export GITHUB_TOKEN="your_token"
+    export OPENAI_API_KEY="your_key"
+    export PR_NUMBER=123
+    export REPO="owner/repo"
+    export ENABLE_STORAGE="true"
+    export MONGODB_URI="mongodb://localhost:27017"
+
+    # Run
+    python -m ai_reviewer.main
+    ```
+
 ---
 
 ## Architecture
