@@ -2,7 +2,7 @@
 
 An intelligent, automated code review system powered by AI. Like CodeRabbit, but self-hosted and fully customizable!
 
-**v2 New:** MongoDB storage + Redis queue for review history and future vectorization.
+**v2 New:** MongoDB storage for review history.
 
 ## Quick Start (For Target Repositories)
 
@@ -46,7 +46,6 @@ Then add `OPENAI_API_KEY` to your repository secrets. Done! 🎉
 | **Documentation** | README, CHANGELOG, docstring requirements |
 | **AI Review** | LLM-powered deep code analysis using GPT |
 | **MongoDB Storage** | 🆕 Save reviews as documents for history/analytics |
-| **Redis Queue** | 🆕 Async messaging for future vectorization pipeline |
 
 ### Priority Levels
 
@@ -69,26 +68,38 @@ Then add `OPENAI_API_KEY` to your repository secrets. Done! 🎉
 
 ## Storage Configuration (v2)
 
-Enable MongoDB/Redis storage by setting these environment variables:
+Enable MongoDB storage by setting these environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ENABLE_STORAGE` | `false` | Enable MongoDB + Redis storage |
+| `ENABLE_STORAGE` | `false` | Enable MongoDB storage |
 | `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection string |
 | `MONGODB_DATABASE` | `ai_reviewer` | Database name |
-| `REDIS_HOST` | `localhost` | Redis host |
-| `REDIS_PORT` | `6379` | Redis port |
-| `REDIS_PASSWORD` | (empty) | Redis password (optional) |
 
-### Docker Setup
+### MongoDB Setup Guide
 
-Start MongoDB, Mongo Express, and Redis locally:
+If you don't have MongoDB installed, here are a few ways to get started:
 
-```bash
-docker-compose up -d
+1.  **MongoDB Atlas (Cloud - Recommended)**
+    *   Sign up for a free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register).
+    *   Create a free cluster.
+    *   Get your connection string (e.g., `mongodb+srv://user:pass@cluster.mongodb.net/`).
+
+2.  **Local Installation**
+    *   **Windows**: Download and install [MongoDB Community Server](https://www.mongodb.com/try/download/community).
+    *   **Mac**: `brew tap mongodb/brew && brew install mongodb-community`
+    *   **Linux**: Follow instructions for your distro on the MongoDB website.
+
+3.  **Docker (If you prefer containers)**
+    ```bash
+    docker run -d -p 27017:27017 --name mongodb mongo:7
+    ```
+
+Once running, update your configuration:
+```yaml
+mongodb_uri: "mongodb://localhost:27017" # or your Atlas URI
 ```
 
-Access Mongo Express UI: http://localhost:8081 (login: `admin` / `admin123`)
 
 ---
 
@@ -184,13 +195,12 @@ jobs:
 ```
 ai-reviewer/           ← This repository (GitHub Action)
 ├── action.yml         # Action definition
-├── docker-compose.yml # MongoDB + Redis + Mongo Express
 ├── ai_reviewer/       # Python source code
 │   ├── main.py        # Entry point
 │   ├── analyzers/     # 6 code analyzers
 │   ├── llm/           # OpenAI integration
 │   ├── github/        # GitHub API client
-│   └── storage/       # 🆕 MongoDB + Redis clients
+│   └── storage/       # 🆕 MongoDB client
 └── .ai-reviewer.yml   # Default config
 
 your-repo/             ← Target repository (only 1 file needed!)
@@ -203,8 +213,7 @@ your-repo/             ← Target repository (only 1 file needed!)
 ## Local Development
 
 ```bash
-# Start storage services
-docker-compose up -d
+# Ensure MongoDB is running first!
 
 # Set environment variables
 export GITHUB_TOKEN=ghp_xxxxx
