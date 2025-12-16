@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AI PR Review
-        uses: DifanaDAP/ai-reviewer@main  # ← Replace with your username
+        uses: RepoName/ai-reviewer@main  # ← Replace with your username
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
